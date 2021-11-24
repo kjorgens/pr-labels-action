@@ -8629,7 +8629,7 @@ async function createPrLabel(owner, repo, prNumber, labelName, labelColor, label
     labelId = await findLabelId(owner, repoId, labelName);
   } catch (err) {
     if (err.message === 'label not found') {
-      console.log(`adding ${labelName} to ${repoName}`);
+      console.log(`adding ${labelName} to ${repo}`);
       const results =  await addLabelToTable(owner, repoId, labelName, labelColor, labelDescription);
       labelId = results.createLabel.label.id;
     }
@@ -8722,7 +8722,6 @@ async function createPrComment(owner, repo, prNum, commentBodyText) {
     let commentRemoveString;
 
     if (github.context.payload.action === 'created' && github.context.payload.comment !== undefined) {
-      action = github.context.payload.comment.body;
       repoName = github.context.payload.repository.name;
       prNumber = github.context.payload.issue.number;
       repoOwner = github.context.payload.organization.login;
