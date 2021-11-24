@@ -8446,7 +8446,7 @@ var __webpack_exports__ = {};
 const core = __nccwpck_require__(2186);
 // import github from '@actions/github';
 const github = __nccwpck_require__(5438);
-const { getOctokit } = github;
+// const { getOctokit } = github;
 // import { graphql } from '@octokit/graphql';
 const ghpkg = __nccwpck_require__(8467);
 const { graphql } = ghpkg;
@@ -8629,6 +8629,7 @@ async function createPrLabel(owner, repo, prNumber, labelName, labelColor, label
     labelId = await findLabelId(owner, repoId, labelName);
   } catch (err) {
     if (err.message === 'label not found') {
+      console.log(`adding ${labelName} to ${repoName}`);
       const results =  await addLabelToTable(owner, repoId, labelName, labelColor, labelDescription);
       labelId = results.createLabel.label.id;
     }
@@ -8640,6 +8641,7 @@ async function createPrLabel(owner, repo, prNumber, labelName, labelColor, label
     core.setFailed(`failure creating label = ${err.message}`);
     process.exit(1);
   }
+  console.log(`label ${labelName} added to ${prNumber}`);
   process.exit(0);
 }
 
@@ -8695,8 +8697,12 @@ async function createPrComment(owner, repo, prNum, commentBodyText) {
 
 (async () => {
   // try {
-  //   await createPrLabel('vivintsolar', 'github-actions-testing', 71, 'testing labels', 'B8f345', 'decsription');
-  //   // await createPrComment(repoOwner, repoName, prNumber, `label ${labelName} added to PR ${prNumber}`);
+  //   const commentAddString = 'add label';
+  //   const reg = new RegExp(commentAddString, 'gi');
+  //   if ('add label'.match(reg)) {
+  //     await createPrLabel('vivintsolar', 'github-actions-testing', 71, 'testing labels', 'B8f345', 'decsription');
+  //     // await createPrComment(repoOwner, repoName, prNumber, `label ${labelName} added to PR ${prNumber}`);
+  //   }
   // } catch (error) {
   //   core.setFailed(error.message);
   //   process.exit(1);
@@ -8721,16 +8727,20 @@ async function createPrComment(owner, repo, prNum, commentBodyText) {
       prNumber = github.context.payload.issue.number;
       repoOwner = github.context.payload.organization.login;
       labelName = core.getInput('label-name');
-      labelColor = core.getInput('label-color');
-      labelDescription = core.getInput('label-description');
-      commentAddString = core.getInput('comment-trigger-add');
-      commentRemoveString = core.getInput('comment-trigger-remove');
+      labelColor = core.getInput('label-color') || 'FBCA04';
+      labelDescription = core.getInput('label-description') || '';
+      commentAddString = core.getInput('comment-trigger-add') || 'add label';
+      commentRemoveString = core.getInput('comment-trigger-remove') || 'remove label';
 
-      if (action.match(`/${commentAddString}/gi`)) {
+      console.log(`${labelName}`);
+      console.log(`${labelColor}`);
+      console.log(`${commentAddString}`);
+      console.log(`${commentRemoveString}`);
+      if (action.match(new RegExp(commentAddString, 'gi'))) {
         await createPrLabel(repoOwner, repoName, prNumber, labelName, labelColor, labelDescription);
         await createPrComment(repoOwner, repoName, prNumber, `label ${labelName} added to PR ${prNumber}`);
       }
-      if (action.match(`/${commentRemoveString}/gi`)) {
+      if (action.match(new RegExp(commentRemoveString, 'gi'))) {
         await removePrLabel(repoOwner, repoName, prNumber, labelName);
         await createPrComment(repoOwner, repoName, prNumber, `label ${labelName} removed from PR ${prNumber}`);
       }
