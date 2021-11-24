@@ -278,6 +278,7 @@ async function createPrComment(owner, repo, prNum, commentBodyText) {
     let commentRemoveString;
 
     if (github.context.payload.action === 'created' && github.context.payload.comment !== undefined) {
+      commentString = github.context.payload.comment.body;
       repoName = github.context.payload.repository.name;
       prNumber = github.context.payload.issue.number;
       repoOwner = github.context.payload.organization.login;
@@ -291,11 +292,11 @@ async function createPrComment(owner, repo, prNum, commentBodyText) {
       console.log(`${labelColor}`);
       console.log(`${commentAddString}`);
       console.log(`${commentRemoveString}`);
-      if (action.match(new RegExp(commentAddString, 'gi'))) {
+      if (commentString.match(new RegExp(commentAddString, 'gi'))) {
         await createPrLabel(repoOwner, repoName, prNumber, labelName, labelColor, labelDescription);
         await createPrComment(repoOwner, repoName, prNumber, `label ${labelName} added to PR ${prNumber}`);
       }
-      if (action.match(new RegExp(commentRemoveString, 'gi'))) {
+      if (commentString.match(new RegExp(commentRemoveString, 'gi'))) {
         await removePrLabel(repoOwner, repoName, prNumber, labelName);
         await createPrComment(repoOwner, repoName, prNumber, `label ${labelName} removed from PR ${prNumber}`);
       }
