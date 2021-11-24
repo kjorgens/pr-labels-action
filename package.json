@@ -1,0 +1,23 @@
+{
+  "name": "pr-labels-action",
+  "version": "1.0.0",
+  "description": "This action adds or removes labels from pull requests",
+  "main": "pr-labels.mjs",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "ncc build pr-labels.mjs -o dist"
+  },
+  "dependencies": {
+    "@actions/core": "^1.6.0",
+    "@actions/github": "^5.0.0",
+    "@octokit/graphql": "^4.8.0",
+    "@types/node": "^16.11.9",
+    "@vercel/ncc": "^0.32.0",
+    "ts-node": "^10.4.0",
+    "typescript": "~4.5.2"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

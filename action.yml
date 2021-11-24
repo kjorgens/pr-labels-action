@@ -1,0 +1,32 @@
+name: 'PR labels'
+description: 'Add and remove labels on pull requests'
+inputs:
+  github-token:
+    description: github access token
+    required: false
+    default: ${{ github.token }}
+  pr-number:
+    description: pull request number
+    required: false
+  comment-trigger-add:
+    description: comment string that triggers label creation/add
+    required: false
+    default: add label
+  comment-trigger-remove:
+    description: comment string that triggers label removal from PR
+    required: false
+    default: remove label
+  label-name:
+    description: label name
+    required: true
+  label-color:
+    description: color number (without leading '#')
+    required: false
+    default: FBCA04
+  label-description:
+    description: describe label
+    required: false
+
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
