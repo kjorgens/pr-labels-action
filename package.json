@@ -2,11 +2,10 @@
   "name": "pr-labels-action",
   "version": "1.0.0",
   "description": "This action adds or removes labels from pull requests",
-  "main": "pr-labels.mjs",
-  "type": "module",
+  "main": "pr-labels.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "ncc build pr-labels.mjs -o dist"
+    "compile": "ncc build pr-labels.js -o dist"
   },
   "dependencies": {
     "@actions/core": "^1.6.0",

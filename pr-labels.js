@@ -1,13 +1,12 @@
-import * as core from '@actions/core';
-// const core = require('@actions/core');
-import github from '@actions/github';
-// const github = require('@actions/github');
-// const { getOctokit } = github;
-import { graphql } from '@octokit/graphql';
-// const ghpkg = require('@octokit/graphql');
-// const { graphql } = ghpkg;
+// import * as core from '@actions/core';
+const core = require('@actions/core');
+// import github from '@actions/github';
+const github = require('@actions/github');
+const { getOctokit } = github;
+// import { graphql } from '@octokit/graphql';
+const ghpkg = require('@octokit/graphql');
+const { graphql } = ghpkg;
 
-let testMode = false;
 // const octokit = github.getOctokit(process.env.GH_TOKEN || core.getInput('github-token'));
 
 const getPRIdQuery = `query($repo: String!, $prNumber: Int!, $owner: String!) {
@@ -251,6 +250,13 @@ async function createPrComment(owner, repo, prNum, commentBodyText) {
 }
 
 (async () => {
+  // try {
+  //   await createPrLabel('vivintsolar', 'github-actions-testing', 71, 'testing labels', 'B8f345', 'decsription');
+  //   // await createPrComment(repoOwner, repoName, prNumber, `label ${labelName} added to PR ${prNumber}`);
+  // } catch (error) {
+  //   core.setFailed(error.message);
+  //   process.exit(1);
+  // }
   try {
     const payload = JSON.stringify(github.context.payload, undefined, 2);
     console.log(payload);
@@ -266,6 +272,7 @@ async function createPrComment(owner, repo, prNum, commentBodyText) {
     let commentRemoveString;
 
     if (github.context.payload.action === 'created' && github.context.payload.comment !== undefined) {
+      action = github.context.payload.comment.body;
       repoName = github.context.payload.repository.name;
       prNumber = github.context.payload.issue.number;
       repoOwner = github.context.payload.organization.login;
@@ -275,11 +282,11 @@ async function createPrComment(owner, repo, prNum, commentBodyText) {
       commentAddString = core.getInput('comment-trigger-add');
       commentRemoveString = core.getInput('comment-trigger-remove');
 
-      if (github.context.payload.comment.body.matches(`/${commentAddString}/gi`)) {
+      if (action.match(`/${commentAddString}/gi`)) {
         await createPrLabel(repoOwner, repoName, prNumber, labelName, labelColor, labelDescription);
         await createPrComment(repoOwner, repoName, prNumber, `label ${labelName} added to PR ${prNumber}`);
       }
-      if (github.context.payload.comment.body.matches(`/${commentRemoveString}/gi`)) {
+      if (action.match(`/${commentRemoveString}/gi`)) {
         await removePrLabel(repoOwner, repoName, prNumber, labelName);
         await createPrComment(repoOwner, repoName, prNumber, `label ${labelName} removed from PR ${prNumber}`);
       }

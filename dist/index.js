@@ -8716,6 +8716,7 @@ async function createPrComment(owner, repo, prNum, commentBodyText) {
     let commentRemoveString;
 
     if (github.context.payload.action === 'created' && github.context.payload.comment !== undefined) {
+      action = github.context.payload.comment.body;
       repoName = github.context.payload.repository.name;
       prNumber = github.context.payload.issue.number;
       repoOwner = github.context.payload.organization.login;
@@ -8725,11 +8726,11 @@ async function createPrComment(owner, repo, prNum, commentBodyText) {
       commentAddString = core.getInput('comment-trigger-add');
       commentRemoveString = core.getInput('comment-trigger-remove');
 
-      if (github.context.payload.comment.body.matches(`/${commentAddString}/gi`)) {
+      if (action.match(`/${commentAddString}/gi`)) {
         await createPrLabel(repoOwner, repoName, prNumber, labelName, labelColor, labelDescription);
         await createPrComment(repoOwner, repoName, prNumber, `label ${labelName} added to PR ${prNumber}`);
       }
-      if (github.context.payload.comment.body.matches(`/${commentRemoveString}/gi`)) {
+      if (action.match(`/${commentRemoveString}/gi`)) {
         await removePrLabel(repoOwner, repoName, prNumber, labelName);
         await createPrComment(repoOwner, repoName, prNumber, `label ${labelName} removed from PR ${prNumber}`);
       }
