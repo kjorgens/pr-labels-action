@@ -61,7 +61,7 @@ const addLabelsMutation = `mutation($labelIds: [ID!]!, $labelableId: ID!) {
 }`;
 
 const removeLabelsMutation = `mutation($labelIds: [ID!]!, $labelableId: ID!) {
-  removeLabelsToLabelable(input:{labelIds: $labelList, labelableId: $labelableId}) {
+  removeLabelsFromLabelable(input:{labelIds: $labelList, labelableId: $labelableId}) {
      labelable {
       labels(first: 50) {
         nodes {
