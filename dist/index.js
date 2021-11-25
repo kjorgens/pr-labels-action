@@ -8675,17 +8675,10 @@ async function removePrLabel(owner, repo, prNumber, labelName, labelColor, label
 }
 
 async function createPrComment(owner, repo, prNum, commentBodyText) {
-  const prInfo = await graphql(getPRIdQuery, {
-    prNumber: prNum,
-    owner: owner,
-    repo: repo,
-    headers: {
-      authorization: `token ${process.env.GH_TOKEN || core.getInput('github-token')}`
-    }
-  });
+  const prId = await findPrId(owner, repo, prNum);
 
   return await graphql(createCommentMutation, {
-    prId: prInfo.repository.pullRequest.id,
+    prId: prId,
     commentBody: commentBodyText,
     owner: owner,
     repo: repo,
@@ -8700,8 +8693,8 @@ async function createPrComment(owner, repo, prNum, commentBodyText) {
   //   const commentAddString = 'add label';
   //   const reg = new RegExp(commentAddString, 'gi');
   //   if ('add label'.match(reg)) {
-  //     await createPrLabel('vivintsolar', 'github-actions-testing', 71, 'testing labels', 'B8f345', 'decsription');
-  //     // await createPrComment(repoOwner, repoName, prNumber, `label ${labelName} added to PR ${prNumber}`);
+  //     // await createPrLabel('vivintsolar', 'github-actions-testing', 71, 'testing labels', 'B8f345', 'decsription');
+  //     await createPrComment('vivintsolar', 'github-actions-testing', 71, `label added to PR 71`);
   //   }
   // } catch (error) {
   //   core.setFailed(error.message);
