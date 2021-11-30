@@ -72,6 +72,18 @@ const removeLabelsMutation = `mutation($labelIds: [ID!]!, $labelableId: ID!) {
   }
 }`;
 
+const removeAllLabelsMutation = `mutation($labelableId: ID!) {
+  clearLabelsFromLabelable(input:{labelableId: $labelableId}) {
+     labelable {
+      labels(first: 50) {
+        nodes {
+          name
+        }
+      }
+    }
+  }
+}`;
+
 const getRepoLabels = `query($repoId: ID!) { 
   node(id: $repoId) {
     ... on Repository {
@@ -90,6 +102,17 @@ async function addLabels(prId, labelId) {
   return await graphql(addLabelsMutation, {
     labelableId: prId,
     labelIds: labelId,
+    headers: {
+      authorization: `token ${process.env.GH_TOKEN || core.getInput('github-token')}`,
+      accept: 'application/vnd.github.bane-preview+json'
+    }
+  });
+}
+
+async function removeAllLabelsFromPr(repoOwner, repo, prNumber) {
+  const prId = await findPrId(repoOwner, repo, prNumber);
+  return await graphql(removeAllLabelsMutation, {
+    labelableId: prId,
     headers: {
       authorization: `token ${process.env.GH_TOKEN || core.getInput('github-token')}`,
       accept: 'application/vnd.github.bane-preview+json'
@@ -201,6 +224,27 @@ async function createPrLabel(owner, repo, prNumber, labelName, labelColor, label
   process.exit(0);
 }
 
+async function removeAllPrLabels(owner, repo, prNumber) {
+  let labelId;
+  let repoId;
+  let prId;
+  try {
+    repoId = await findRepoId(owner, repo);
+    prId = await findPrId(owner, repo, prNumber);
+  } catch(err) {
+    core.setFailed(`failure finding pull request ${prNumber}: ${err.message}`);
+    process.exit(1);
+  }
+
+  try {
+    const labels = await clearAllPrLabels(prId);
+  } catch (err) {
+    core.setFailed(`failure removing labels = ${err.message}`);
+    process.exit(1);
+  }
+  process.exit(0);
+}
+
 async function removePrLabel(owner, repo, prNumber, labelName, labelColor, labelDescription) {
   let labelId;
   let repoId;
@@ -209,7 +253,7 @@ async function removePrLabel(owner, repo, prNumber, labelName, labelColor, label
     repoId = await findRepoId(owner, repo);
     prId = await findPrId(owner, repo, prNumber);
   } catch(err) {
-    core.setFailed(`failure removing label = ${err.message}`);
+    core.setFailed(`failure finding pull request ${prNumber}: ${err.message}`);
     process.exit(1);
   }
   try {
@@ -245,57 +289,61 @@ async function createPrComment(owner, repo, prNum, commentBodyText) {
 }
 
 (async () => {
-  // try {
-  //   const commentAddString = 'add label';
-  //   const reg = new RegExp(commentAddString, 'gi');
-  //   if ('add label'.match(reg)) {
-  //     // await createPrLabel('vivintsolar', 'github-actions-testing', 71, 'testing labels', 'B8f345', 'decsription');
-  //     await createPrComment('vivintsolar', 'github-actions-testing', 71, `label added to PR 71`);
-  //   }
-  // } catch (error) {
-  //   core.setFailed(error.message);
-  //   process.exit(1);
-  // }
   try {
-    // const payload = JSON.stringify(github.context.payload, undefined, 2);
-    // console.log(payload);
-
-    let repoName;
-    let prNumber;
-    let repoOwner;
-    let action;
-    let labelName;
-    let labelColor;
-    let labelDescription;
-    let commentAddString;
-    let commentRemoveString;
-
-    if (github.context.payload.action === 'created' && github.context.payload.comment !== undefined) {
-      commentString = github.context.payload.comment.body;
-      repoName = github.context.payload.repository.name;
-      prNumber = github.context.payload.issue.number;
-      repoOwner = github.context.payload.organization.login;
-      labelName = core.getInput('label-name');
-      labelColor = core.getInput('label-color') || 'FBCA04';
-      labelDescription = core.getInput('label-description') || '';
-      commentAddString = core.getInput('comment-trigger-add') || 'add label';
-      commentRemoveString = core.getInput('comment-trigger-remove') || 'remove label';
-
-      console.log(`${labelName}`);
-      console.log(`${labelColor}`);
-      console.log(`${commentAddString}`);
-      console.log(`${commentRemoveString}`);
-      if (commentString.match(new RegExp(commentAddString, 'gi'))) {
-        await createPrLabel(repoOwner, repoName, prNumber, labelName, labelColor, labelDescription);
-        await createPrComment(repoOwner, repoName, prNumber, `label ${labelName} added to PR ${prNumber}`);
-      }
-      if (commentString.match(new RegExp(commentRemoveString, 'gi'))) {
-        await removePrLabel(repoOwner, repoName, prNumber, labelName);
-        await createPrComment(repoOwner, repoName, prNumber, `label ${labelName} removed from PR ${prNumber}`);
-      }
+    const commentAddString = 'add label';
+    const reg = new RegExp(commentAddString, 'gi');
+    if ('add label'.match(reg)) {
+      // await createPrLabel('vivintsolar', 'github-actions-testing', 71, 'testing labels', 'B8f345', 'decsription');
+      // await createPrComment('vivintsolar', 'github-actions-testing', 71, `label added to PR 71`);
+      await removeAllLabelsFromPr('vivintsolar', 'github-actions-testing', 71);
     }
   } catch (error) {
     core.setFailed(error.message);
     process.exit(1);
   }
+  // try {
+    // const payload = JSON.stringify(github.context.payload, undefined, 2);
+    // console.log(payload);
+
+  //   let repoName;
+  //   let prNumber;
+  //   let repoOwner;
+  //   let action;
+  //   let labelName;
+  //   let labelColor;
+  //   let labelDescription;
+  //   let commentAddString;
+  //   let commentRemoveString;
+  //
+  //   if (github.context.payload.action === 'created' && github.context.payload.comment !== undefined) {
+  //     commentString = github.context.payload.comment.body;
+  //     repoName = github.context.payload.repository.name;
+  //     prNumber = github.context.payload.issue.number;
+  //     repoOwner = github.context.payload.organization.login;
+  //     labelName = core.getInput('label-name');
+  //     labelColor = core.getInput('label-color') || 'FBCA04';
+  //     labelDescription = core.getInput('label-description') || '';
+  //     commentAddString = core.getInput('comment-trigger-add') || 'add label';
+  //     commentRemoveString = core.getInput('comment-trigger-remove') || 'remove label';
+  //
+  //
+  //     console.log(`${labelName}`);
+  //     console.log(`${labelColor}`);
+  //     console.log(`${commentAddString}`);
+  //     console.log(`${commentRemoveString}`);
+  //     if (commentString.match(new RegExp(commentAddString, 'gi'))) {
+  //       await createPrLabel(repoOwner, repoName, prNumber, labelName, labelColor, labelDescription);
+  //     }
+  //     if (commentString.match(new RegExp(commentRemoveString, 'gi'))) {
+  //       await removePrLabel(repoOwner, repoName, prNumber, labelName);
+  //     }
+  //
+  //     if (commentString.match(new RegExp(commentRemoveAllString, 'gi'))) {
+  //       await removeAllLabelsFromPr(repoOwner, repoName, prNumber);
+  //     }
+  //   }
+  // } catch (error) {
+  //   core.setFailed(error.message);
+  //   process.exit(1);
+  // }
 })();
