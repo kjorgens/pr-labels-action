@@ -8769,12 +8769,8 @@ async function createPrComment(owner, repo, prNum, commentBodyText) {
       labelDescription = core.getInput('label-description') || '';
       commentAddString = core.getInput('comment-trigger-add') || 'add label';
       commentRemoveString = core.getInput('comment-trigger-remove') || 'remove label';
+      commentRemoveAllString = core.getInput('comment-trigger-remove-all') || 'remove all labels';
 
-
-      console.log(`${labelName}`);
-      console.log(`${labelColor}`);
-      console.log(`${commentAddString}`);
-      console.log(`${commentRemoveString}`);
       if (commentString.match(new RegExp(commentAddString, 'gi'))) {
         await createPrLabel(repoOwner, repoName, prNumber, labelName, labelColor, labelDescription);
       }
