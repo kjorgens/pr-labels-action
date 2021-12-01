@@ -15,7 +15,7 @@ inputs:
   comment-trigger-remove:
     description: comment string that triggers label removal from PR
     required: false
-    default: remove label
+    default: remove labels
   comment-trigger-remove-all:
     description: comment string to trigger all labels from PR
     required: false
