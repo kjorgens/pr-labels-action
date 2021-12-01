@@ -8739,28 +8739,28 @@ async function createPrComment(owner, repo, prNum, commentBodyText) {
 }
 
 (async () => {
-  try {
-    let labelName = 'short test';
-    const commentString = 'remove labels automated pr, Label Action, missing';
-    const reg = new RegExp('remove labels', 'gi');
-    if (commentString.match(reg)) {
-      if (commentString.length > 'remove labels'.length + 2) {
-        labelName = commentString.slice('remove labels'.length + 1);
-        multiLabel = labelName.split(',');
-        await removePrLabels('vivintsolar', 'github-actions-testing', 71, multiLabel);
-
-        console.log('done');
-      }
-
-      // await createPrLabel('vivintsolar', 'github-actions-testing', 71, labelName, 'B8f345', 'decsription');
-      // await removeAllPrLabels('vivintsolar', 'github-actions-testing', 71, labelName, 'B8f345', 'decsription');
-
-      // await removeAllLabelsFromPr('vivintsolar', 'github-actions-testing', 71);
-    }
-  } catch (error) {
-    core.setFailed(error.message);
-    process.exit(1);
-  }
+  // try {
+  //   let labelName = 'short test';
+  //   const commentString = 'remove labels automated pr, Label Action, missing';
+  //   const reg = new RegExp('remove labels', 'gi');
+  //   if (commentString.match(reg)) {
+  //     if (commentString.length > 'remove labels'.length + 2) {
+  //       labelName = commentString.slice('remove labels'.length + 1);
+  //       multiLabel = labelName.split(',');
+  //       await removePrLabels('vivintsolar', 'github-actions-testing', 71, multiLabel);
+  //
+  //       console.log('done');
+  //     }
+  //
+  //     // await createPrLabel('vivintsolar', 'github-actions-testing', 71, labelName, 'B8f345', 'decsription');
+  //     // await removeAllPrLabels('vivintsolar', 'github-actions-testing', 71, labelName, 'B8f345', 'decsription');
+  //
+  //     // await removeAllLabelsFromPr('vivintsolar', 'github-actions-testing', 71);
+  //   }
+  // } catch (error) {
+  //   core.setFailed(error.message);
+  //   process.exit(1);
+  // }
   try {
     // const payload = JSON.stringify(github.context.payload, undefined, 2);
     // console.log(payload);
