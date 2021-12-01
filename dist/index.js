@@ -8668,27 +8668,6 @@ async function createPrLabel(owner, repo, prNumber, labelName, labelColor, label
   process.exit(0);
 }
 
-async function removeAllPrLabels(owner, repo, prNumber) {
-  let labelId;
-  let repoId;
-  let prId;
-  try {
-    repoId = await findRepoId(owner, repo);
-    prId = await findPrId(owner, repo, prNumber);
-  } catch(err) {
-    core.setFailed(`failure finding pull request ${prNumber}: ${err.message}`);
-    process.exit(1);
-  }
-
-  try {
-    const labels = await clearAllPrLabels(prId);
-  } catch (err) {
-    core.setFailed(`failure removing labels = ${err.message}`);
-    process.exit(1);
-  }
-  process.exit(0);
-}
-
 async function removePrLabels(owner, repo, prNumber, labelNames) {
   let repoId;
   let prId;
@@ -8768,7 +8747,6 @@ async function createPrComment(owner, repo, prNum, commentBodyText) {
     let repoName;
     let prNumber;
     let repoOwner;
-    let action;
     let labelName;
     let labelColor;
     let labelDescription;
